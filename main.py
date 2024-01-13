@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
@@ -23,7 +22,6 @@ def cities_connection(cities):
                 list_of_connections.append((city, cities[city], city2, cities[city2]))
     return list_of_connections
 
-
 def haversine(list_of_connections):
     dic = {}
     for i in range(len(list_of_connections)):
@@ -46,7 +44,6 @@ def haversine(list_of_connections):
         c = 2 * np.arcsin(np.sqrt(a))
         dic[con] = round(rad * c)
     return dic
-
 
 def calculate_total_distance(route, distances):
     total_distance = 0
@@ -89,7 +86,7 @@ def draw_shortest_route(frame):
                 llcrnrlon=-30, urcrnrlon=60, resolution='c')
     m.drawcoastlines()
     m.drawcountries()
-
+    # m.bluemarble() #lags
     route_coordinates = [airports[city] for city in shortest_route[:frame+1]]
     route_coordinates = np.array(route_coordinates)
 
@@ -102,7 +99,7 @@ def draw_shortest_route(frame):
         plt.text(x, y, city, fontsize=12, ha='left', color = 'blue')
 
     plt.title(f'Optimal route for DreamFlight airline')
-    plt.axis('off')
+    plt.axis('on')
     plt.subplots_adjust(bottom=0.1)
     shortest_route_str=""
     for airport in shortest_route:
@@ -111,6 +108,21 @@ def draw_shortest_route(frame):
     plt.text(0.5, -0.05, f'Shortest route: {shortest_route_str}', fontsize=12, ha='center', transform=ax.transAxes)
     plt.text(0.5, -0.09, f'Shortest distance: {shortest_distance} km', fontsize=12, ha='center', transform=ax.transAxes)
 
+def distances_betw_each_city_from_tsp(all_distances, tsp_route_result):
+    dic_of_tsp_each_distances = {}
+    for i in range(len(tsp_route_result) - 1):
+        city1, city2 = tsp_route_result[i], tsp_route_result[i + 1]
+        key_forward = f'{city1} - {city2}'
+        key_backward = f'{city2} - {city1}'
+
+        if key_forward in all_distances:
+            dic_of_tsp_each_distances[key_forward] = all_distances[key_forward]
+        elif key_backward in all_distances:
+            dic_of_tsp_each_distances[key_backward] = all_distances[key_backward]
+
+    return dic_of_tsp_each_distances
+
+
 
 distances = haversine(cities_connection(airports))
 shortest_route, shortest_distance = tsp_bruteforce(distances)
@@ -118,8 +130,9 @@ shortest_route, shortest_distance = tsp_bruteforce(distances)
 print("Najkrótsza trasa:", shortest_route)
 print("Najkrótsza odległość:", shortest_distance)
 
+print(distances_betw_each_city_from_tsp(distances, shortest_route))
 fig, ax = plt.subplots(figsize=(12, 10))
-ani = FuncAnimation(fig, draw_shortest_route, frames=len(shortest_route), interval=200, repeat=True)
+ani = FuncAnimation(fig, draw_shortest_route, frames=len(shortest_route), interval=400, repeat=True)
 
 plt.show()
 
