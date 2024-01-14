@@ -1,6 +1,3 @@
-from main import tsp_solver, shortest_route
-
-
 #planes fly at an average speed of 800 km/h
 
 #pilots can work for 6h a day -
@@ -10,47 +7,50 @@ from main import tsp_solver, shortest_route
 #per flight we need 2 pilots and 3 flight attendant
 
 
-print(shortest_route)
-
-dic_of_routes_with_distances=tsp_solver.distances_betw_each_city_from_tsp(shortest_route)
-d=dic_of_routes_with_distances
-
-flight_attendant_counter=0
-
-def time_of_one_flight(distance):
-    time_int=distance/800
+def time_of_one_flight(distance, aircraft_speed=800):
+    time_int=distance/aircraft_speed
     minutes=int(time_int*60)
 
     return (minutes+60) #added 1h as a cost of departure and arrival
 
-def pilot_shift():
+def pilot_shift(d, shortest_route): # d is a dictionary with flight connections and distance beetween itz
+    list_of_pilot_change =[]
     limit=6*60 #6h of pilot shift
     current_shift=0
     pilot_counter=2
     for key in d:
-
         if current_shift+time_of_one_flight(d[key])>limit:
+            for city in range(len(shortest_route)):
+                if city + 1 < len(shortest_route) and shortest_route[city + 1]:
+                    if shortest_route[city] in key and shortest_route[city+1] in key:
+                        # print("Przesiadka w", shortest_route[city])
+                        list_of_pilot_change.append(shortest_route[city])
             pilot_counter+=2
             current_shift=0
-        print(current_shift, pilot_counter)
         current_shift = current_shift + time_of_one_flight(d[key])
-    print()
-    return pilot_counter
+    list_of_pilot_change.append(pilot_counter) #number of needed pilots is at the end of the list
+    return list_of_pilot_change
 
 
-def flight_attendant_shit():
+def flight_attendant_shift(d, shortest_route):
     limit=8*60 #8h of flight attendant shift
     current_shift=0
-    fa_counter=3
+    fa_counter=3 #fa stands for flight attendant
+    list_of_fa_change=[]
     for key in d:
-
-        if current_shift+time_of_one_flight(d[key])>limit:
+        if current_shift + time_of_one_flight(d[key]) > limit:
+            for city in range(len(shortest_route)):
+                if city + 1 < len(shortest_route) and shortest_route[city + 1]:
+                    if shortest_route[city] in key and shortest_route[city + 1] in key:
+                        list_of_fa_change.append(shortest_route[city])
             fa_counter+=3
             current_shift=0
-        print(current_shift, fa_counter)
         current_shift = current_shift + time_of_one_flight(d[key])
-    print()
-    return fa_counter
+    list_of_fa_change.append(fa_counter)
+    return list_of_fa_change
 
-print(pilot_shift())
-print(flight_attendant_shit())
+def display_info(list_of_crew_change, who):
+    l=list_of_crew_change
+    for i in range(len(l)-1):
+        print("Wymiana załogi:",who, "w mieście", l[i])
+    print("Łączna ilość pracowników -", who, ":",l[len(l)-1])
