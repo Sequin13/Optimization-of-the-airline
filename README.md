@@ -1,6 +1,6 @@
 # TSP Solver for DreamFlight Airline
 
-This project provides a solution to the Traveling Salesman Problem (TSP) for DreamFlight Airline, optimizing the route for its flights. The TSP is a classic optimization problem where the goal is to find the shortest possible route that visits a given set of cities and returns to the starting city. In this case, the cities represent airports, and the distances between them are calculated based on their geographical coordinates.
+This project provides a solution to the Traveling Salesman Problem (TSP) for DreamFlight Airline (imaginary airline), optimizing the route for its flights. The TSP is a classic optimization problem where the goal is to find the shortest possible route that visits a given set of cities and returns to the starting city. In this case, the cities represent airports, and the distances between them are calculated based on their geographical coordinates.
 
 ## TSP Solver Implementation
 
